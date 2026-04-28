@@ -22,13 +22,68 @@
     </div>
 
     <div class="card">
-        <h3>Attendance Records</h3>
+        <h3>Daily Summary ({{ today }})</h3>
+        {% if daily_summary %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Attended Today</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in daily_summary %}
+                        <tr>
+                            <td>{{ row.student_name }}</td>
+                            <td>{{ row.attended_count }} / 7</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="muted">No summary available.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="card">
+    <h3>Subject-wise Attendance Stats</h3>
+    {% if subject_stats %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Attended</th>
+                    <th>Total</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in subject_stats %}
+                    <tr>
+                        <td>{{ subject.subject_name }}</td>
+                        <td>{{ subject.attended_count }}</td>
+                        <td>{{ subject.total_count }}</td>
+                        <td>{{ "%.2f"|format(subject.percentage) }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="muted">No subject stats available.</p>
+    {% endif %}
+</section>
+
+<section class="card">
+    <h3>Attendance Records (Period-wise)</h3>
         {% if attendance_records %}
             <table>
                 <thead>
                     <tr>
                         <th>Student</th>
                         <th>Date</th>
+                        <th>Period</th>
+                        <th>Subject</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -37,6 +92,8 @@
                         <tr>
                             <td>{{ record.student_name }}</td>
                             <td>{{ record.date }}</td>
+                            <td>{{ record.period }}</td>
+                            <td>{{ record.subject_name }}</td>
                             <td><span class="status {{ record.status|lower }}">{{ record.status }}</span></td>
                         </tr>
                     {% endfor %}
@@ -45,7 +102,6 @@
         {% else %}
             <p class="muted">No attendance records found.</p>
         {% endif %}
-    </div>
 </section>
 
 <section class="card">

@@ -4,7 +4,7 @@
 {% block content %}
 <section class="dashboard-header">
     <h2>Welcome, {{ user.name }}</h2>
-    <p>Manage your attendance and leave requests.</p>
+    <p>Manage your period-wise attendance and leave requests.</p>
     <div class="quick-actions">
         <a class="btn" href="{{ url_for('attendance_page') }}">Mark Attendance</a>
         <a class="btn secondary" href="{{ url_for('leave_request_page') }}">Apply Leave</a>
@@ -15,18 +15,47 @@
     <h3>Attendance Summary</h3>
     <div class="summary-grid">
         <div class="summary-item">
-            <span class="summary-label">Total Records</span>
-            <strong>{{ total_attendance }}</strong>
+            <span class="summary-label">Today</span>
+            <strong>{{ today_present }} / {{ today_total }} classes</strong>
         </div>
         <div class="summary-item">
-            <span class="summary-label">Present Count</span>
+            <span class="summary-label">Present Classes</span>
             <strong>{{ present_count }}</strong>
         </div>
         <div class="summary-item">
-            <span class="summary-label">Attendance Percentage</span>
+            <span class="summary-label">Overall Attendance %</span>
             <strong>{{ "%.2f"|format(attendance_percentage) }}%</strong>
         </div>
     </div>
+</section>
+
+<section class="card">
+    <h3>Subject-wise Attendance</h3>
+    {% if subject_stats %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Attended</th>
+                    <th>Total</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in subject_stats %}
+                    <tr class="{% if subject.is_low %}low-attendance{% endif %}">
+                        <td>{{ subject.subject_name }}</td>
+                        <td>{{ subject.attended_count }}</td>
+                        <td>{{ subject.total_count }}</td>
+                        <td>{{ "%.2f"|format(subject.percentage) }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p class="muted">Rows highlighted in red are below 75% attendance.</p>
+    {% else %}
+        <p class="muted">No subject-wise attendance data available yet.</p>
+    {% endif %}
 </section>
 
 <section class="grid two-columns">
@@ -37,6 +66,8 @@
                 <thead>
                     <tr>
                         <th>Date</th>
+                        <th>Period</th>
+                        <th>Subject</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -44,6 +75,8 @@
                     {% for item in attendance_history %}
                         <tr>
                             <td>{{ item.date }}</td>
+                            <td>{{ item.period }}</td>
+                            <td>{{ item.subject_name }}</td>
                             <td><span class="status {{ item.status|lower }}">{{ item.status }}</span></td>
                         </tr>
                     {% endfor %}

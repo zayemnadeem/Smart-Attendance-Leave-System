@@ -2,21 +2,47 @@
 {% block title %}Mark Attendance{% endblock %}
 
 {% block content %}
-<section class="card narrow">
-    <h2>Mark Attendance</h2>
-    <p class="muted">Attendance can be marked only between 9 AM and 5 PM from approved IP range.</p>
+<section class="card">
+    <h2>Mark Period-wise Attendance</h2>
+    <p class="muted">Date: {{ today }} ({{ day_name }})</p>
 
-    <form id="attendance-form" class="form">
-        <label for="attendance-status">Status</label>
-        <select id="attendance-status" name="status" required>
-            <option value="">-- Select status --</option>
-            <option value="Present">Present</option>
-            <option value="Absent">Absent</option>
-        </select>
-        <button type="submit">Submit Attendance</button>
-    </form>
+    {% if timetable_exists %}
+        <form id="attendance-form" class="form">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Period</th>
+                        <th>Subject</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in period_rows %}
+                        <tr>
+                            <td>{{ row.period }}</td>
+                            <td>{{ row.subject_name }}</td>
+                            <td>
+                                {% if row.is_locked %}
+                                    <span class="status {{ row.status|lower }}">{{ row.status }}</span>
+                                {% else %}
+                                    <select class="period-status" data-period="{{ row.period }}" required>
+                                        <option value="">-- Select status --</option>
+                                        <option value="Present">Present</option>
+                                        <option value="Absent">Absent</option>
+                                    </select>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit">Submit Attendance</button>
+        </form>
+    {% else %}
+        <p class="muted">No timetable is configured for today. Attendance cannot be marked.</p>
+    {% endif %}
 
-    <div id="attendance-message" class="ajax-message"></div>
+    <div id="attendance-message" class="ajax-message" role="alert"></div>
     <a href="{{ url_for('student_dashboard') }}" class="text-link">Back to Dashboard</a>
 </section>
 {% endblock %}

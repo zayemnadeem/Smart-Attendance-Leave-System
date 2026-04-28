@@ -10,11 +10,25 @@ function setMessage(elementId, message, isError = false) {
 async function submitAttendance(event) {
     event.preventDefault();
 
-    const statusSelect = document.getElementById("attendance-status");
-    const status = statusSelect ? statusSelect.value : "";
+    const statusInputs = Array.from(document.querySelectorAll(".period-status"));
+    if (!statusInputs.length) {
+        setMessage("attendance-message", "No periods available to submit.", true);
+        return;
+    }
 
-    if (!status) {
-        setMessage("attendance-message", "Please select attendance status.", true);
+    const attendance = [];
+    for (const input of statusInputs) {
+        const status = input.value;
+        const period = Number(input.dataset.period);
+        if (!status) {
+            setMessage("attendance-message", "Please select status for all unmarked periods.", true);
+            return;
+        }
+        attendance.push({ period, status });
+    }
+
+    if (!attendance.length) {
+        setMessage("attendance-message", "All periods are already marked for today.", true);
         return;
     }
 
@@ -24,14 +38,16 @@ async function submitAttendance(event) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ status }),
+            body: JSON.stringify({ attendance }),
         });
 
         const data = await response.json();
         setMessage("attendance-message", data.message, !data.success);
 
-        if (data.success && statusSelect) {
-            statusSelect.value = "";
+        if (data.success) {
+            setTimeout(() => {
+                window.location.reload();
+            }, 700);
         }
     } catch (error) {
         setMessage("attendance-message", "Failed to connect to server.", true);

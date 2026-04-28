@@ -15,7 +15,7 @@ def get_connection():
 
 
 def init_db():
-    """Create database tables if they do not already exist."""
+    """Create/upgrade database tables required by the app."""
     with get_connection() as connection:
         cursor = connection.cursor()
         cursor.execute(
@@ -27,15 +27,35 @@ def init_db():
             );
             """
         )
+
+        # Recreate attendance table when old schema is present.
+        attendance_columns = cursor.execute("PRAGMA table_info(attendance);").fetchall()
+        expected_columns = {"id", "user_id", "date", "period", "subject_id", "status"}
+        current_columns = {column["name"] for column in attendance_columns} if attendance_columns else set()
+        if current_columns and current_columns != expected_columns:
+            cursor.execute("DROP TABLE IF EXISTS attendance;")
+
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS subjects (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE
+            );
+            """
+        )
+
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS attendance (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 date TEXT NOT NULL,
-                status TEXT NOT NULL CHECK(status IN ('Present', 'Absent')),
+                period INTEGER NOT NULL CHECK(period BETWEEN 1 AND 7),
+                subject_id INTEGER NOT NULL,
+                status TEXT NOT NULL CHECK(status IN ('Present', 'Absent', 'Excused')),
                 FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-                UNIQUE(user_id, date)
+                FOREIGN KEY(subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
+                UNIQUE(user_id, date, period)
             );
             """
         )
@@ -74,4 +94,16 @@ def seed_users():
                     "INSERT INTO users (name, role) VALUES (?, ?);",
                     (name, role),
                 )
+        connection.commit()
+
+
+def seed_subjects(subject_names):
+    """Insert timetable subjects only if they do not already exist."""
+    with get_connection() as connection:
+        cursor = connection.cursor()
+        for subject_name in sorted(set(subject_names)):
+            cursor.execute(
+                "INSERT OR IGNORE INTO subjects (name) VALUES (?);",
+                (subject_name,),
+            )
         connection.commit()

@@ -4,6 +4,7 @@
 {% block content %}
 <section class="card narrow">
     <h2>Apply for Leave</h2>
+    <p class="muted">Leave requests are full-day only. Approved leave marks all 7 periods as Excused.</p>
     <form method="POST" action="{{ url_for('apply_leave') }}" class="form">
         <label for="date">Leave Date</label>
         <input type="date" name="date" id="date" required />

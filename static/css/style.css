@@ -172,6 +172,11 @@ td {
     color: #92400e;
 }
 
+.status.excused {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
 .alert {
     padding: 10px 12px;
     border-radius: 8px;
@@ -234,6 +239,10 @@ td {
 .list {
     margin: 0;
     padding-left: 18px;
+}
+
+.low-attendance td {
+    background: #fff1f2;
 }
 
 @media (max-width: 900px) {
