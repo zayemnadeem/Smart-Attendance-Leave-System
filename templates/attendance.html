@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Mark Attendance{% endblock %}
+
+{% block content %}
+<section class="card narrow">
+    <h2>Mark Attendance</h2>
+    <p class="muted">Attendance can be marked only between 9 AM and 5 PM from approved IP range.</p>
+
+    <form id="attendance-form" class="form">
+        <label for="attendance-status">Status</label>
+        <select id="attendance-status" name="status" required>
+            <option value="">-- Select status --</option>
+            <option value="Present">Present</option>
+            <option value="Absent">Absent</option>
+        </select>
+        <button type="submit">Submit Attendance</button>
+    </form>
+
+    <div id="attendance-message" class="ajax-message"></div>
+    <a href="{{ url_for('student_dashboard') }}" class="text-link">Back to Dashboard</a>
+</section>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<section class="dashboard-header">
+    <h2>Welcome, {{ user.name }}</h2>
+    <p>Manage your attendance and leave requests.</p>
+    <div class="quick-actions">
+        <a class="btn" href="{{ url_for('attendance_page') }}">Mark Attendance</a>
+        <a class="btn secondary" href="{{ url_for('leave_request_page') }}">Apply Leave</a>
+    </div>
+</section>
+
+<section class="card">
+    <h3>Attendance Summary</h3>
+    <div class="summary-grid">
+        <div class="summary-item">
+            <span class="summary-label">Total Records</span>
+            <strong>{{ total_attendance }}</strong>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Present Count</span>
+            <strong>{{ present_count }}</strong>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Attendance Percentage</span>
+            <strong>{{ "%.2f"|format(attendance_percentage) }}%</strong>
+        </div>
+    </div>
+</section>
+
+<section class="grid two-columns">
+    <div class="card">
+        <h3>Attendance History</h3>
+        {% if attendance_history %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in attendance_history %}
+                        <tr>
+                            <td>{{ item.date }}</td>
+                            <td><span class="status {{ item.status|lower }}">{{ item.status }}</span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="muted">No attendance records found.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Leave Requests</h3>
+        {% if leave_history %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for leave in leave_history %}
+                        <tr>
+                            <td>{{ leave.date }}</td>
+                            <td>{{ leave.reason }}</td>
+                            <td><span class="status {{ leave.status|lower }}">{{ leave.status }}</span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="muted">No leave requests found.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

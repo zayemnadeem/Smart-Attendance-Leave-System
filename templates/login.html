@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Login | Smart Attendance{% endblock %}
+
+{% block content %}
+<section class="card narrow">
+    <h2>Login</h2>
+    <form method="POST" action="{{ url_for('login') }}" class="form">
+        <label for="user_id">Select User</label>
+        <select name="user_id" id="user_id" required>
+            <option value="">-- Select user --</option>
+            {% for user in users %}
+                <option value="{{ user.id }}">{{ user.name }} ({{ user.role }})</option>
+            {% endfor %}
+        </select>
+
+        <label for="role">Select Role</label>
+        <select name="role" id="role" required>
+            <option value="">-- Select role --</option>
+            <option value="student">Student</option>
+            <option value="admin">Admin</option>
+        </select>
+
+        <button type="submit">Login</button>
+    </form>
+</section>
+{% endblock %}

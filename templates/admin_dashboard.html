@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="dashboard-header">
+    <h2>Welcome, {{ user.name }}</h2>
+    <p>Manage students, attendance records, and leave requests.</p>
+</section>
+
+<section class="grid two-columns">
+    <div class="card">
+        <h3>Students</h3>
+        {% if students %}
+            <ul class="list">
+                {% for student in students %}
+                    <li>{{ student.name }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">No students found.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Attendance Records</h3>
+        {% if attendance_records %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in attendance_records %}
+                        <tr>
+                            <td>{{ record.student_name }}</td>
+                            <td>{{ record.date }}</td>
+                            <td><span class="status {{ record.status|lower }}">{{ record.status }}</span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="muted">No attendance records found.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="card">
+    <h3>Leave Requests</h3>
+    {% if leave_requests %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Date</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave in leave_requests %}
+                    <tr id="leave-row-{{ leave.id }}">
+                        <td>{{ leave.student_name }}</td>
+                        <td>{{ leave.date }}</td>
+                        <td>{{ leave.reason }}</td>
+                        <td>
+                            <span class="status {{ leave.status|lower }}" id="leave-status-{{ leave.id }}">
+                                {{ leave.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if leave.status == 'Pending' %}
+                                <button
+                                    class="btn-small"
+                                    onclick="updateLeaveStatus({{ leave.id }}, 'approve')">
+                                    Approve
+                                </button>
+                                <button
+                                    class="btn-small danger"
+                                    onclick="updateLeaveStatus({{ leave.id }}, 'reject')">
+                                    Reject
+                                </button>
+                            {% else %}
+                                <span class="muted">No action</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="muted">No leave requests found.</p>
+    {% endif %}
+</section>
+
+<div id="admin-action-message" class="ajax-message"></div>
+{% endblock %}
